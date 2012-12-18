@@ -1,0 +1,10 @@
+
+Installation
+
+    git clone git://URL_GIT ~/.vim
+
+    ln -s ~/.vim/.vimrc ~/.vimrc
+
+    
+    For Powerline add-on users, install the ttf font available at the root 
+    of this directory and enable it as defaut font in your terminal emulator.
