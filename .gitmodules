@@ -28,3 +28,6 @@
 [submodule "bundle/snipmate_dep_tlib"]
 	path = bundle/snipmate_dep_tlib
 	url = https://github.com/tomtom/tlib_vim
+[submodule "bundle/powershell"]
+	path = bundle/powershell
+	url = https://github.com/PProvost/vim-ps1.git
