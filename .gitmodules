@@ -31,3 +31,9 @@
 [submodule "bundle/clang_complete"]
 	path = bundle/clang_complete
 	url = https://github.com/Rip-Rip/clang_complete.git
+[submodule "bundle/tcomment"]
+	path = bundle/tcomment
+	url = https://github.com/tomtom/tcomment_vim.git
+[submodule "bundle/matrix_screensaver"]
+	path = bundle/matrix_screensaver
+	url = https://github.com/uguu-org/vim-matrix-screensaver.git

@@ -183,8 +183,15 @@ if has("syntax")
     " Enables syntax highlighting
     syntax on
 
-    " Set a colorscheme 
-    colorscheme jellybeans
+    " Set a colorscheme if it exists
+    try
+        let s:definedColorscheme = "jellybeans"
+        execute "colorscheme " . s:definedColorscheme
+    catch /^Vim\%((\a\+)\)\=:E185/
+        echohl ErrorMsg
+        echo "The colorscheme \"" s:definedColorscheme . "\" doesn't exist, using \"" . colorscheme . "\" instead."
+        echohl None
+    endtry
 
     " If using a dark background within the editing area and syntax highlighting
     " turn on this option as well, and forces the colorcheme to be adapted
@@ -192,6 +199,24 @@ if has("syntax")
 
     " Highlight the line where the cursor is currently on
     set cursorline
+
+    " Reduces the scope of the syntax highlight, which prevents Vim to hang
+    " terribly when sytax highlight is used on very long lines.
+    if has("autocmd")
+        " Update session when leaving Vim
+        augroup ReduceHighlishtScope
+            autocmd!
+    "        autocmd VimLeave * :call <SID>UpdateSession()<cr>
+        augroup end
+
+        function! s:GetMaxLength()
+            return max(map(range(1, line('$')), "col([v:val, '$'])")) - 1
+        endfunction
+
+        function! s:ReduceHighlishtScope()
+
+        endfunction
+    endif
 endif
 
 " Display information in the bottom line
