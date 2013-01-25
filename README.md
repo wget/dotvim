@@ -2,7 +2,7 @@
 
 ### Clone this repository
 
-    `git clone git://URL_GIT ~/.vim`
+    `git clone https://github.com/wget/dotvim.git ~/.vim`
 
 ### Create symlinks
 
@@ -15,9 +15,9 @@
 
 ## Add a new plugin
 
-    `git submodule add THE_NEW_GIT_URL DESTINATION_NAME`
+    `git submodule add git://URL_OF_THE_REPOSITORY_TO_ADD DESTINATION_NAME`
 
-## To remove an existing plugin
+## Remove an existing plugin
 
 All commands are made from the superproject directory.
 
@@ -25,22 +25,22 @@ All commands are made from the superproject directory.
     
 `git rm --cached YOUR_SUBMODULE_PATH`
 
-This option is enough as the entries from the .gitmodules file aren't
+This option is enough as the entries from the `.gitmodules` file aren't
 relevant for modules to exist. The only commands looking at that file
 are:
-    - `git submodule init`
-    - and `git submodule sync`
+- `git submodule init`
+- and `git submodule sync`
 
 ### Long and clean method:
 
-- Edit/delete .gitmodules to remove the submodule. 
-- To remove the files specific to your module
+- Edit/delete `.gitmodules` to remove the submodule location.
+- Remove the files specific to your module
     `rm -rf YOUR_SUBMODULE_PATH`
-- To ask the superproject git repository to untrack the module
+- Ask the superproject git repository to untrack the module
     `git rm -f --cached YOUR_SUBMODULE_PATH`
 - Commit your changes to the superproject
     `git commit -am "Removed submodules!"`
-- Inspect .git/config for "submodule" entries to remove. 
+- Inspect `.git/config` for "submodule" entries to remove. 
     
 ## Optional notes
     
