@@ -6,7 +6,7 @@
 
 ### Create symlinks
 
-    `ln -s ~/.vim/.vimrc ~/.vimrc`
+    `ln -s ~/.vim/vimrc ~/.vimrc`
 
 ### Switch to the "~/.vim" directory and fetch sumodules with
 
@@ -42,7 +42,8 @@ are:
     `git commit -am "Removed submodules!"`
 - Inspect `.git/config` for "submodule" entries to remove. 
     
-## Optional notes
+## Dependencies
     
-For Powerline add-on users, install the ttf font available at the root 
+For Powerline users, make sure your terminal emulator is using UTF-8 ancoding.
+If you can't make it, install the ttf font available at the root 
 of this directory and enable it as defaut font in your terminal emulator.
