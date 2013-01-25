@@ -37,3 +37,12 @@
 [submodule "bundle/matrix_screensaver"]
 	path = bundle/matrix_screensaver
 	url = https://github.com/uguu-org/vim-matrix-screensaver.git
+[submodule "bundle/md"]
+	path = bundle/md
+	url = https://github.com/hughbien/md-vim.git
+[submodule "bundle/molokai_colorscheme"]
+	path = bundle/molokai_colorscheme
+	url = https://github.com/tomasr/molokai.git
+[submodule "bundle/jellybeans_colorscheme"]
+	path = bundle/jellybeans_colorscheme
+	url = https://github.com/nanotech/jellybeans.vim.git

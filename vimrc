@@ -62,6 +62,22 @@ runtime! archlinux.vim
 " See :help system-vimrc for more details.
 set nocompatible
 
+" Enable pathogen plugin which aims to install plugins and runtime files in their
+" own private directories
+if filereadable(expand("$HOME/.vim/bundle/pathogen/autoload/pathogen.vim"))
+    " Avoid symlink usage in ~/.vim/autoload/pathogen.vim
+    " to stick pathoge as a submodule
+    runtime bundle/pathogen/autoload/pathogen.vim
+
+    " Add ~/.vim/bundle to the runtimepath
+    " If you don't like the directory name `bundle`, you can pass a different
+    " name as an argument: call pathogen#infect('~/src/vim/bundle')
+    call pathogen#infect()
+
+    " Regenerate tags for all help files located in the new bundle repository
+    Helptags
+endif
+
 " Define the <Leader> key in replacement of the default one \
 let mapleader = ","
 
@@ -93,22 +109,6 @@ if has("autocmd")
     augroup end
 endif
 
-" Enable pathogen plugin which aims to install plugins and runtime files in their
-" own private directories
-if filereadable(expand("$HOME/.vim/bundle/pathogen/autoload/pathogen.vim"))
-    " Avoid symlink usage in ~/.vim/autoload/pathogen.vim
-    " to stick pathoge as a submodule
-    runtime bundle/pathogen/autoload/pathogen.vim
-
-    " Add ~/.vim/bundle to the runtimepath
-    " If you don't like the directory name `bundle`, you can pass a different
-    " name as an argument: call pathogen#infect('~/src/vim/bundle')
-    call pathogen#infect()
-
-    " Regenerate tags for all help files located in the new bundle repository
-    Helptags
-endif
-"
 " Automatically save before commands like :next and :make
 "set autowrite
 
@@ -123,7 +123,7 @@ nnoremap <leader>n :call <SID>NumberToggle()<cr>
 function! s:NumberToggle()
     if &number
         setlocal nonumber
-        echo "Line numbers desactivated for \"" . expand("%:p") . "\""
+        echo "Line numbers deactivated for \"" . expand("%:p") . "\""
     else
         setlocal number
         echo "Line numbers activated for \"" . expand("%:p") . "\""
@@ -135,7 +135,7 @@ nnoremap <leader>rn :call <SID>RelativeNumberToggle()<cr>
 function! s:RelativeNumberToggle()
     if &relativenumber
         setlocal norelativenumber
-        echo "Relative numbers desactivated for \"" . expand("%:p") . "\""
+        echo "Relative numbers deactivated for \"" . expand("%:p") . "\""
     else
         setlocal relativenumber
         echo "Relative numbers activated for \"" . expand("%:p") . "\""
@@ -147,7 +147,7 @@ nnoremap <silent><leader>f :call <SID>FoldColumnToggle()<cr>
 function! s:FoldColumnToggle()
     if &foldcolumn
         setlocal foldcolumn=0
-        echo "Fold column desactivated for \"" . @% . "\""
+        echo "Fold column deactivated for \"" . @% . "\""
     else
         setlocal foldcolumn=4
         echo "Fold column activated for \"" . @% . "\""
@@ -172,13 +172,6 @@ inoremap <silent><c-v> <esc>"+pi
 "-------------------------------------------------------------------------------
 " Appearance {{{
 " Enable the use of grouping markers in vim (default {{{ and }}})
-if has("folding")
-    augroup filetype_vim
-        autocmd!
-        autocmd FileType vim,sh setlocal foldmethod=marker foldlevelstart=0
-    augroup end
-endif
-
 if has("syntax")
     " Enables syntax highlighting
     syntax on
@@ -186,11 +179,11 @@ if has("syntax")
     " Set a colorscheme if it exists
     try
         let s:definedColorscheme = "jellybeans"
+        " let g:molokai_original = 1
         execute "colorscheme " . s:definedColorscheme
-    catch /^Vim\%((\a\+)\)\=:E185/
-        echohl ErrorMsg
-        echo "The colorscheme \"" s:definedColorscheme . "\" doesn't exist, using \"" . colorscheme . "\" instead."
-        echohl None
+    catch /^Vim(\a\+):E185:/
+        echo v:throwpoint
+        echo 'The colorscheme "' . s:definedColorscheme . '" doesn''t exist, using the default one instead.'
     endtry
 
     " If using a dark background within the editing area and syntax highlighting
@@ -201,12 +194,11 @@ if has("syntax")
     set cursorline
 
     " Reduces the scope of the syntax highlight, which prevents Vim to hang
-    " terribly when sytax highlight is used on very long lines.
+    " terribly when syntax highlight is used on very long lines.
     if has("autocmd")
-        " Update session when leaving Vim
         augroup ReduceHighlishtScope
             autocmd!
-    "        autocmd VimLeave * :call <SID>UpdateSession()<cr>
+            autocmd BufReadPost,VimResized * :call <SID>ReduceHighlishtScope()
         augroup end
 
         function! s:GetMaxLength()
@@ -214,7 +206,9 @@ if has("syntax")
         endfunction
 
         function! s:ReduceHighlishtScope()
-
+            if s:GetMaxLength() ># &columns
+                execute "set synmaxcol=" . &columns
+            endif
         endfunction
     endif
 endif
@@ -223,7 +217,7 @@ endif
 if has("statusline")
     " IMPROVE: Try to detect Powerline plugin as g:powerline_enabled doesn't exist
     " in this namespace
-    " FIXME: Doesn't work if global Vim configuration used
+    " FIXME: Doesn't work if system-wide Vim configuration used
     if filereadable(expand("$HOME/.vim/bundle/powerline/plugin/Powerline.vim"))
         " FIXME: Check xterm-256color
         "if &t_Co < 256
@@ -360,6 +354,13 @@ set tabstop=4
 set shiftwidth=4
 set expandtab
 set autoindent
+
+if has("folding")
+    augroup filetype_vim
+        autocmd!
+        autocmd FileType vim,sh setlocal foldmethod=marker foldlevelstart=0
+    augroup end
+endif
 "}}}
 
 "-------------------------------------------------------------------------------
@@ -424,7 +425,7 @@ if has("extra_search")
         if &l:hlsearch
             " FIXME: hlsearch is a global boolean, no way to set it to local
             setlocal nohlsearch
-            echo "Highlighted matches desactivated for \"" . expand("%:p") . "\""
+            echo "Highlighted matches deactivated for \"" . expand("%:p") . "\""
         else
             setlocal hlsearch
             echo "Highlighted matches activated for \"" . expand("%:p") . "\""
