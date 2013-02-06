@@ -690,3 +690,11 @@ noremap <C-PageUp> gT
 noremap <S-l> gt
 noremap <C-PageDown> gt
 "}}}
+
+"-------------------------------------------------------------------------------
+" Window management {{{
+" Increase window size
+nnoremap w+ <C-W>>
+" Decrease window size
+nnoremap w- <C-W><
+"}}}
