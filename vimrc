@@ -1,56 +1,10 @@
 "-------------------------------------------------------------------------------
 " README: PREREQUESITES {{{
-" For maximum ease while reading please enter this command:
+" For maximum ease while reading this file, please enter this command:
 " :set foldmethod=marker
-"
-"z Use your system package manager to search and install the needed following
-" packages:
-"   - vim-spell
-"   - clang
-"
-" Please install the following Vim plugins by searching and downloading them
-" from vim.org website
-"   - pathogen
-"   - snipMate
-"     NOTE: When used in combination with clang_complete plugin, please disable
-"           the snippet . -> []
-"   - superTab
-"   - clang_complete
-"   - surround
 "
 " NOTE: Avoid mapping CTRL-TAB keys, it's a little tricky, as the keys are first
 " catched by the terminal emulator
-"}}}
-
-"-------------------------------------------------------------------------------
-" Distribution specific {{{
-" All system-wide defaults are set in
-" '$VIMRUNTIME/THE_NAME_OF_YOUR_DISTRIBUTION.vim' usually just in
-" '/usr/share/vim/vimcurrent/' or
-" '/usr/share/vim/vimfiles/'.
-" These distribution files are sourced by the call to :runtime you can find 
-" below. If you wish to change any of those settings, you should do it in the
-" system-wide file (/etc/vim/vimrc or /etc/vimrc or any other distribution
-" specific system-wide configuration), since the file in '/usr/share' will be
-" overwritten everytime an upgrade of the vim packages is performed. It is
-" recommended to make changes after sourcing the distribution specific .vim
-" file since it alters the value of the 'compatible' option.
-
-" These lines should not be removed as they ensure that various options are
-" properly set to work with the Vim-related packages of your distribution.
-runtime! debian.vim
-runtime! archlinux.vim
-
-" Uncomment the next line to make Vim more Vi-compatible
-" NOTE: your distribution specific .vim file sets 'nocompatible'. Setting
-" 'compatible' changes numerous options, so any other options should be set
-" AFTER setting 'compatible'.
-"set compatible
-
-" If you prefer the old-style vim functionalty, add 'runtime!
-"vimrc_example.vim'
-" Or better yet, read /usr/share/vim/vim73/vimrc_example.vim or the vim manual
-" " and configure vim to your own liking!
 "}}}
 
 "-------------------------------------------------------------------------------
@@ -81,12 +35,12 @@ endif
 " Define the <Leader> key in replacement of the default one \
 let mapleader = ","
 
-" Enable mouse usage (in normal mode)
+" Enable the mouse usage in the Vim normal mode
 if has("mouse")
     set mouse=n
 endif
 
-" Change encoding to avoid ^B and stranges characters apperaing in the
+" Change encoding to avoid ^B and stranges characters appearing in the
 " statusline when used with vim-powerline plugin
 set encoding=utf-8
 
@@ -123,10 +77,10 @@ nnoremap <leader>n :call <SID>NumberToggle()<cr>
 function! s:NumberToggle()
     if &number
         setlocal nonumber
-        echo "Line numbers deactivated for \"" . expand("%:p") . "\""
+        echo "Line numbers disabled for \"" . expand("%:p") . "\""
     else
         setlocal number
-        echo "Line numbers activated for \"" . expand("%:p") . "\""
+        echo "Line numbers enabled for \"" . expand("%:p") . "\""
     endif
 endfunction
 
@@ -135,10 +89,10 @@ nnoremap <leader>rn :call <SID>RelativeNumberToggle()<cr>
 function! s:RelativeNumberToggle()
     if &relativenumber
         setlocal norelativenumber
-        echo "Relative numbers deactivated for \"" . expand("%:p") . "\""
+        echo "Relative numbers disabled for \"" . expand("%:p") . "\""
     else
         setlocal relativenumber
-        echo "Relative numbers activated for \"" . expand("%:p") . "\""
+        echo "Relative numbers enabled for \"" . expand("%:p") . "\""
     endif
 endfunction
 
@@ -166,7 +120,8 @@ nnoremap <leader>" mqviw<esc>bi"<esc>ea"<esc>`ql
 " Paste from X clipboard
 " NOTE: Don't map this key in normal mode: CTRL-V is used for vertical selection
 inoremap <silent><c-v> <esc>"+pi
-
+" Copy to X clipboard
+inoremap <silent><c-c> <esc>"+yi
 "}}}
 
 "-------------------------------------------------------------------------------
@@ -263,7 +218,6 @@ endif
 "    highlight link OverLength ColorColumn
 "    exec 'match OverLength /\%'.&cc.'v.\+/'
 "endif
-
 "}}}
 
 "-------------------------------------------------------------------------------
@@ -273,72 +227,30 @@ if filereadable("/usr/share/dict/words")
     set dictionary+=/usr/share/dict/words
 endif
 
-" Define <Tab> as shortcut key for word completion
-" FIXME: Beginning a line with a tab create an infinite loop
-" FIXME: If enabled supertab plugin doesn't work anymore
-"inoremap <silent><Tab> <C-X><C-K>
-
-" Disable preview scratch window appearing on completion)
+" Disable preview scratch window appearing on completion
 set completeopt=menu,menuone,longest
 
-" Determines the maximum number of items to show in the popup menu for
-" Insert mode completion
+" Set the maximum number of items to be displayed show in the popup menu
 if has("insert_expand")
     set pumheight=15
 endif
 
-" SuperTab option for context aware completion
-if exists("g:SuperTabDefaultCompletionType")
-    let g:SuperTabDefaultCompletionType = "context"
-endif
+" 
+if v:version >= 703 && has("patch584")
+    if has("python")
 
-" Disable auto popup, use <Tab> to autocomplete
-if exists("g:clang_complete_auto")
-    let g:clang_complete_auto = 0
-endif
-
-" Show clang errors in the quickfix window
-if exists("g:clang_complete_copen")
-    let g:clang_complete_copen = 1
-endif
-
-" Define <F4> key as toggle key for quickfix dialog
-nnoremap <silent><F4> :call <SID>ToggleList("Quickfix List", 'c')<cr>
-
-function! s:GetBufferList()
-    redir =>buflist
-    silent! ls
-    redir END
-    return buflist
-endfunction
-
-function! s:ToggleList(bufname, pfx)
-    let buflist = <SID>GetBufferList()
-    for bufnum in map(filter(split(buflist, '\n'), 'v:val =~ "'.a:bufname.'"'), 'str2nr(matchstr(v:val, "\\d\\+"))')
-        if bufwinnr(bufnum) != -1
-            exec(a:pfx.'close')
-            return
-        endif
-    endfor
-    if a:pfx == 'l' && len(getloclist(0)) == 0
+    else
         echohl ErrorMsg
-        echo "Location List is Empty."
-        return
+        echom "Vim needs to have python support in order for the plugin \"YouCompleteMe\" to work."
+        echoHl None
     endif
-    let winnr = winnr()
-    exec(a:pfx.'open')
-    if winnr() != winnr
-        wincmd p
-    endif
-endfunction
-
-" Define <F5> key as intellisense-like update (copen dialog)
-if exists("g:clang_complete_auto")
-    augroup ClangUpdate
-        autocmd!
-        autocmd FileType c,cpp,h,hpp map <buffer><silent><F5> :call g:ClangUpdateQuickFix()<cr>
-    augroup end
+else
+    echohl ErrorMsg
+    echom "You need at least Vim 7.3.584 in order for the plugin \"YouCompleteMe\" to work."
+    echoHl None
 endif
+
+
 "}}}
 
 "-------------------------------------------------------------------------------
@@ -365,8 +277,8 @@ endif
 
 "-------------------------------------------------------------------------------
 " Operator pending-mapping {{{
-" NOTE: For mnemonic, the operator abbreviation name are set as "Inside Next
-" parenthese".
+" NOTE: For mnemonic, the operator abbreviation names are set as "Inside Next
+" Parentheses".
 " Visually select text around last parentheses
 onoremap ip) :<c-u>normal! F)vi(<cr>
 
@@ -382,7 +294,6 @@ onoremap in{ :<c-u>normal! F{vi}<cr>
 " Next email address
 " TODO: It's still failed, f**** regex
 "onoremap in@ :<c-u>normal! /([a-zA-Z0-9]+[-_.]*)+@([a-zA-Z0-9]+[-_.]?)+.[a-z]{2,}<cr>
-
 "}}}
 
 "-------------------------------------------------------------------------------
