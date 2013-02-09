@@ -1,14 +1,14 @@
 ## Installation
 
-### Clone this repository
+Clone this repository
 
     `git clone https://github.com/wget/dotvim.git ~/.vim`
 
-### Create symlinks
+Create symlinks
 
     `ln -s ~/.vim/vimrc ~/.vimrc`
 
-### Switch to the "~/.vim" directory and fetch sumodules with
+Switch to the "~/.vim" directory and fetch sumodules with
 
     `git submodule init`
     `git submodule update`
@@ -21,7 +21,7 @@
 
 All commands are made from the superproject directory.
 
-### Short method (shortest one):
+### Short method:
     
 `git rm --cached YOUR_SUBMODULE_PATH`
 
@@ -31,7 +31,7 @@ are:
 - `git submodule init`
 - and `git submodule sync`
 
-### Long and clean method:
+### Long but clean method:
 
 - Edit/delete `.gitmodules` to remove the submodule location.
 - Remove the files specific to your module
