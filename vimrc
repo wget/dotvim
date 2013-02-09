@@ -1,5 +1,5 @@
+"{{{ README: PREREQUESITES
 "-------------------------------------------------------------------------------
-" README: PREREQUESITES {{{
 " For maximum ease while reading this file, please enter this command:
 " :set foldmethod=marker
 "
@@ -7,8 +7,8 @@
 " catched by the terminal emulator
 "}}}
 
+"{{{ General settings
 "-------------------------------------------------------------------------------
-" General settings {{{
 " Enhance supported features in Vim by dropping Vi compatibility.
 " When used for system-wide configuration, the vimrc file will ALWAYS be
 " read in 'compatible' mode. This mode will produce some errors in this
@@ -124,8 +124,8 @@ inoremap <silent><c-v> <esc>"+pi
 inoremap <silent><c-c> <esc>"+yi
 "}}}
 
+"{{{ Appearance
 "-------------------------------------------------------------------------------
-" Appearance {{{
 " Enable the use of grouping markers in vim (default {{{ and }}})
 if has("syntax")
     " Enables syntax highlighting
@@ -220,8 +220,8 @@ endif
 "endif
 "}}}
 
+"{{{ Autocompletion
 "-------------------------------------------------------------------------------
-" Autocompletion {{{
 " Add location of the dictionary word completion
 if filereadable("/usr/share/dict/words")
     set dictionary+=/usr/share/dict/words
@@ -253,8 +253,8 @@ endif
 
 "}}}
 
+"{{{ Indentation
 "-------------------------------------------------------------------------------
-" Indentation {{{
 if has("autocmd")
     " Load indentation rules and plugins according to the detected filetype
     filetype plugin indent on
@@ -275,8 +275,8 @@ if has("folding")
 endif
 "}}}
 
+"{{{ Operator pending-mapping
 "-------------------------------------------------------------------------------
-" Operator pending-mapping {{{
 " NOTE: For mnemonic, the operator abbreviation names are set as "Inside Next
 " Parentheses".
 " Visually select text around last parentheses
@@ -290,14 +290,10 @@ onoremap ip{ :<c-u>normal! F}vi{<cr>
 
 " Visually select text around next bracket
 onoremap in{ :<c-u>normal! F{vi}<cr>
-
-" Next email address
-" TODO: It's still failed, f**** regex
-"onoremap in@ :<c-u>normal! /([a-zA-Z0-9]+[-_.]*)+@([a-zA-Z0-9]+[-_.]?)+.[a-z]{2,}<cr>
 "}}}
 
+"{{{ Search options
 "-------------------------------------------------------------------------------
-" Search options {{{
 " Opens help vertically
 noremap <leader><F1> :vertical rightbelow help<cr>
 
@@ -367,8 +363,8 @@ function! GrepOperator(...)
 endfunction
 " }}}
 
+"{{{ Sessions management
 "-------------------------------------------------------------------------------
-" Sessions management {{{
 " The following functions will save your settings (see :help :mksession) on Vim
 " exit, and load those settings when you enter Vim again from the same folder.
 
@@ -566,8 +562,8 @@ endfunction
 "endfunction
 "}}}
 
+"{{{ Sourcing mappings
 "-------------------------------------------------------------------------------
-" Sourcing mappings {{{
 " Source a local configuration file if available
 if filereadable("/etc/vim/vimrc.local")
     source /etc/vim/vimrc.local
@@ -587,8 +583,8 @@ endif
 nnoremap <silent><leader>s :source %<cr>:execute 'echo "\"' . expand("%:p") . '\" sourced"'<cr>
 "}}}
 
+"{{{ Tabs management
 "-------------------------------------------------------------------------------
-" Tabs management {{{
 " Map a key to select directly the numbered tab
 map <C-t> :tabnew <cr>
 map <S-w> :tabclose <cr>
@@ -602,8 +598,8 @@ noremap <S-l> gt
 noremap <C-PageDown> gt
 "}}}
 
+"{{{ Window management
 "-------------------------------------------------------------------------------
-" Window management {{{
 " Increase window size
 nnoremap w+ <C-W>>
 " Decrease window size
