@@ -4,12 +4,12 @@
 [submodule "bundle/powerline"]
 	path = bundle/powerline
 	url = https://github.com/Lokaltog/vim-powerline.git
-[submodule "bundle/snipmate"]
-	path = bundle/snipmate
-	url = https://github.com/garbas/vim-snipmate.git
 [submodule "bundle/surround"]
 	path = bundle/surround
 	url = https://github.com/tpope/vim-surround.git
+[submodule "bundle/snipmate"]
+	path = bundle/snipmate
+	url = https://github.com/garbas/vim-snipmate.git
 [submodule "bundle/snipmate_snippets"]
 	path = bundle/snipmate_snippets
 	url = https://github.com/honza/snipmate-snippets
@@ -22,8 +22,8 @@
 [submodule "bundle/snipmate_dep_tlib"]
 	path = bundle/snipmate_dep_tlib
 	url = https://github.com/tomtom/tlib_vim
-[submodule "bundle/powershell"]
-	path = bundle/powershell
+[submodule "bundle/support_powershell"]
+	path = bundle/support_powershell
 	url = https://github.com/PProvost/vim-ps1.git
 [submodule "bundle/tcomment"]
 	path = bundle/tcomment
@@ -31,12 +31,18 @@
 [submodule "bundle/matrix_screensaver"]
 	path = bundle/matrix_screensaver
 	url = https://github.com/uguu-org/vim-matrix-screensaver.git
-[submodule "bundle/md"]
-	path = bundle/md
+[submodule "bundle/support_markdown"]
+	path = bundle/support_markdown
 	url = https://github.com/hughbien/md-vim.git
-[submodule "bundle/molokai_colorscheme"]
-	path = bundle/molokai_colorscheme
+[submodule "bundle/colorscheme_molokai"]
+	path = bundle/colorscheme_molokai
 	url = https://github.com/tomasr/molokai.git
-[submodule "bundle/jellybeans_colorscheme"]
-	path = bundle/jellybeans_colorscheme
+[submodule "bundle/colorscheme_jellybeans"]
+	path = bundle/colorscheme_jellybeans
 	url = https://github.com/nanotech/jellybeans.vim.git
+[submodule "bundle/YouCompleteMe"]
+	path = bundle/YouCompleteMe
+	url = https://github.com/Valloric/YouCompleteMe.git
+[submodule "bundle/vundle"]
+	path = bundle/vundle
+	url = https://github.com/gmarik/vundle.git

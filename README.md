@@ -8,7 +8,7 @@ Create symlinks
 
     `ln -s ~/.vim/vimrc ~/.vimrc`
 
-Switch to the "~/.vim" directory and fetch sumodules with
+Switch to the "~/.vim" directory and fetch git submodules with
 
     `git submodule init`
     `git submodule update`
