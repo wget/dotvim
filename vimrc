@@ -73,9 +73,13 @@ inoremap <c-u> <esc>mqviwU`qa
 
 " Surround a word with "
 nnoremap <leader>" mqviw<esc>bi"<esc>ea"<esc>`ql
+" Surround a word with '
+nnoremap <leader>' mqviw<esc>bi'<esc>ea'<esc>`ql
+" Surround a visual block with "
+vnoremap <leader>' mq<esc>`<i"<esc>`>a"<esc>`q
 
-" Paste from X clipboard
-" NOTE: Don't map this key in normal mode: CTRL-V is used for vertical selection
+" Paste from X clipboard NOTE: Don't map this key in normal mode: CTRL-V is
+" used for vertical selection
 inoremap <silent><c-v> <esc>"+pi
 
 " Copy to X clipboard
@@ -308,11 +312,24 @@ set linebreak
 set nolist
 
 " Format automatically paragraphs everytime text is inserted or deleted.
-set formatoptions+=a
+set formatoptions=a
 " Only apply reformat on comments to avoid the code to become broken.
 set formatoptions+=c
+" Automatically insert the current comment leader after hitting 'o' or 'O' in
+" normal mode.
+set formatoptions+=o
+" Allow formatting of comments with "gq".
+set formatoptions+=q
+" Recognize automatically number lists and format them.
+set formatoptions+=n
 " Don't break a line after a one letter word
 set formatoptions+=1
+
+"Replace all ^M with normal linebreak
+nnoremap <leader>r<cr> :%s/<C-V><C-M>/<C-V><C-M>/g<cr>
+
+"Delete the additional linebreak induced by Windows/DOS style
+nnoremap <leader>d<cr> :%s/<C-V><C-M>//g<cr>
 "}}}
 
 "{{{ Autocompletion
@@ -448,6 +465,9 @@ nnoremap <leader>g<F1> :helpgrep
 nnoremap / /\v
 vnoremap / /\v
 
+" Search inside the selected scope with /
+vnoremap / <Esc>/\%V
+
 " Highlight the trailing whitespaces as an error
 nnoremap <silent><leader>w :match Error /\v $/<cr> :echo "Trailing whitespaces marked as error."<cr>
 nnoremap <silent><leader>W :match none<cr>
@@ -462,7 +482,7 @@ function! GrepOperator(...)
     let word = "shellescape(expand(\"<cword>\"))"
     if a:000[0] ==# "up"
         let l:word = "shellescape(expand("<cWORD>"))"
-    echom word
+        echom word
     endif
     execute 'grep! -R ' . word . ' .'
     redraw!

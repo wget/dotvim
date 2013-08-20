@@ -40,9 +40,6 @@
 [submodule "bundle/colorscheme_jellybeans"]
 	path = bundle/colorscheme_jellybeans
 	url = https://github.com/nanotech/jellybeans.vim.git
-[submodule "bundle/YouCompleteMe"]
-	path = bundle/YouCompleteMe
-	url = https://github.com/Valloric/YouCompleteMe.git
 [submodule "bundle/vundle"]
 	path = bundle/vundle
 	url = https://github.com/gmarik/vundle.git
