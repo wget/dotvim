@@ -11,3 +11,22 @@ git submodule add https://github.com/tomasr/molokai.git bundle/colorscheme_molok
 git submodule add https://github.com/nanotech/jellybeans.vim.git bundle/colorscheme_jellybeans
 git submodule add https://github.com/Valloric/YouCompleteMe.git bundle/YouCompleteMe
 git submodule add https://github.com/vim-scripts/UltiSnips.git bundle/UltiSnips
+
+
+
+colorscheme_clouds_midnight
+colorscheme_jellybeans
+colorscheme_molokai
+hexmode
+matrix_screensaver
+pathogen
+powerline
+snipmate
+snipmate_dep_mw_utils
+snipmate_dep_tlib
+snipmate_snippets
+snipmate_snippets_bibtex
+support_markdown
+support_powershell
+surround
+tcomment

@@ -15,32 +15,17 @@ Switch to the "~/.vim" directory and fetch git submodules with
 
 ## Add a new plugin
 
-    `git submodule add git://URL_OF_THE_REPOSITORY_TO_ADD DESTINATION_NAME`
+    Edit the vimrc configuration file and add a 
+    `Bundle GITHUB_USERNAME/NAME_OF_PROJECT`
+    statement and type
+    `:BundleInstall`
 
 ## Remove an existing plugin
 
-All commands are made from the superproject directory.
-
-### Short method:
-    
-`git rm --cached YOUR_SUBMODULE_PATH`
-
-This option is enough as the entries from the `.gitmodules` file aren't
-relevant for modules to exist. The only commands looking at that file
-are:
-- `git submodule init`
-- and `git submodule sync`
-
-### Long but clean method:
-
-- Edit/delete `.gitmodules` to remove the submodule location.
-- Remove the files specific to your module
-    `rm -rf YOUR_SUBMODULE_PATH`
-- Ask the superproject git repository to untrack the module
-    `git rm -f --cached YOUR_SUBMODULE_PATH`
-- Commit your changes to the superproject
-    `git commit -am "Removed submodules!"`
-- Inspect `.git/config` for "submodule" entries to remove. 
+    Edit the vimrc configuration file and remove a 
+    `Bundle GITHUB_USERNAME/NAME_OF_PROJECT`
+    statement and type
+    `:BundleClean` and confirm
     
 ## Dependencies
     
