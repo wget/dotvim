@@ -4,12 +4,13 @@
 " please enter this command:
 " :set foldmethod=marker
 "
-" NOTE: Avoid mapping CTRL-TAB keys, it's a little tricky, as the keys are first
-" catched by the terminal emulator when Vim is used in CLI.
+" NOTE: Avoid mapping keys like CTRL and TAB, it's a little tricky, as the
+" keys are first catched by the terminal emulator when Vim is used in CLI.
 "}}}
 
 "{{{ General settings
 "-------------------------------------------------------------------------------
+
 " Enhance supported features in Vim by dropping Vi compatibility.
 " When used for system-wide configuration, the vimrc file will ALWAYS be
 " read in 'compatible' mode. This mode will produce some errors in this
@@ -17,8 +18,9 @@
 " See :help system-vimrc for more details.
 set nocompatible
 
-" Disable the modeline usage, preventing such a malicious code to be executed
-" see http://lists.alioth.debian.org/pipermail/pkg-vim-maintainers/2007-June/004020.html
+" Disable the modeline usage, preventing vimscript code that could be
+" malicious to be executed see
+" http://lists.alioth.debian.org/pipermail/pkg-vim-maintainers/2007-June/004020.html
 " Modeline is a Vim feature allowing to define Vim parameters for a specific
 " file at the first or at the last lines of that file.
 set modelines=0
@@ -26,33 +28,22 @@ set modelines=0
 " Define the <Leader> key in replacement of the default one \
 let mapleader = ","
 
-" Enable the mouse usage in the Vim normal mode
+" Define <Leader> key mapping local to a buffer (depending on the filetype for
+" example).
+let maplocalleader =  ";"
+
+" Enable the mouse usage only in Vim normal mode, as we want still to use the
+" selection managed by the terminal when Vim is in insert mode.
 if has("mouse")
     set mouse=n
 endif
 
-" Use UTF-8 encoding in file and avoid ^B and stranges characters appearing
+" Use UTF-8 encoding in file and avoid ^B and strange characters appearing
 " in the statusline when used with vim-powerline plugin.
 set encoding=utf-8
 
-" When line wrapping is enabled, move according the screen lines and not
-" according to the file lines.
-nnoremap j gj
-nnoremap k gk
-
+" Enable spell checking only for C, C++ and Tex files
 if has("autocmd")
-    " Jump to the last position when reopening a file
-    augroup lastPosition
-        autocmd!
-        autocmd BufReadPost * :call <SID>LastFilePosition()
-    augroup end
-    function! s:LastFilePosition()
-        if line("'\"") > 1 && line("'\"") <= line("$")
-            execute "normal! g'\""
-        endif
-    endfunction
-
-    " Enable spell checking only for C, C++ and Tex files
     augroup spellChecking
         autocmd!
         autocmd FileType c,cpp,tex setlocal spell
@@ -62,7 +53,8 @@ endif
 " Automatically save before commands like :next and :make
 "set autowrite
 
-" Hide buffers when they are abandoned, instead of unloading them
+" Hide buffers when they are abandoned, instead of unloading them (use much
+" memory space).
 "set hidden
 
 " Convert the current word to lowercase in insert mode
@@ -73,97 +65,244 @@ inoremap <c-u> <esc>mqviwU`qa
 
 " Surround a word with "
 nnoremap <leader>" mqviw<esc>bi"<esc>ea"<esc>`ql
+
 " Surround a word with '
 nnoremap <leader>' mqviw<esc>bi'<esc>ea'<esc>`ql
+
 " Surround a visual block with "
 vnoremap <leader>' mq<esc>`<i"<esc>`>a"<esc>`q
 
-" Paste from X clipboard NOTE: Don't map this key in normal mode: CTRL-V is
-" used for vertical selection
+" Paste from X clipboard.
+" NOTE: Don't map this key in normal mode as CTRL-V is used for vertical
+" selection.
 inoremap <silent><c-v> <esc>"+pi
 
-" Copy to X clipboard
+" Copy to X clipboard.
 inoremap <silent><c-c> <esc>"+yi
 
-" Reselect the text that was just pasted
+" Reselect the text that was just pasted.
 nnoremap <leader>v V`]
 
-" Save automatically the file when losing focus
+" Save automatically the file when losing focus.
 augroup saveOnFocusLost
     autocmd!
     autocmd FocusLost * :wa
 augroup end
+
 "}}}
 
 "{{{ Plugins management
 "-------------------------------------------------------------------------------
-" Enable vundle plugin which aims to install plugins and runtime files in their
-" own private directories
-let systemVimrc = system('vim --version')
 
-if strlen(finddir(fnamemodify($MYVIMRC, ":p:h") . "/.vim/bundle/vundle/"))
-    " You got an error when sourced from /etc/vimrc location
-    " Solution: Parse the :version output
-    "let g:GetVersion = system('vim --version') echo g:GetVersion
+" Get system vimrc location.
+redir => s:versionRedirected
+    silent version
+redir END
+
+let s:splitted = split(s:versionRedirected)
+
+let s:i = 0
+for j in s:splitted
+    if (j ==# "system") && (get(s:splitted, s:i + 1) ==# "vimrc") && get(s:splitted, s:i + 2) =~ "file:"
+        let s:systemVimrcLocation = get(s:splitted, s:i + 3)
+    endif
+
+    let s:i += 1
+endfor
+unlet s:splitted
+
+let s:temp = split(s:systemVimrcLocation, '\zs')
+let s:stringSize = strlen(s:systemVimrcLocation) - 1
+let s:systemVimrcLocation = ''
+let s:i = 1
+while s:i < s:stringSize 
+    let s:systemVimrcLocation .= get(s:temp, s:i)
+    let s:i += 1
+endwhile
+unlet s:i
+
+" If vundle is installed in /home/USERNAME/.vim/bundle/vundle
+"                     or in /etc/vim/bundle/vundle, use it!
+" NOTE: Only the path is checked.
+if strlen(finddir(fnamemodify($MYVIMRC, ":p:h") . "/.vim/bundle/vundle/")) ||
+  \strlen(finddir(fnamemodify(s:systemVimrcLocation, ":p:h") . "/vim/bundle/vundle/"))
 
     filetype off
 
     " Add Vundle to the runtimepath
-    set runtimepath+=~/.vim/bundle/vundle/
-    "runtime bundle/vundle/autoload/vundle.vim
+    if strlen(finddir(fnamemodify($MYVIMRC, ":p:h") . "/.vim/bundle/vundle/"))
+        set runtimepath+=~/.vim/bundle/vundle/
+    elseif strlen(finddir(fnamemodify(s:systemVimrcLocation, ":p:h") . "/vim/bundle/vundle/"))
+        let $systemVundle=fnamemodify(s:systemVimrcLocation, ":p:h") . '/vim/bundle/vundle'
+        set runtimepath+=$systemVundle
+    endif
 
-    " If you don't like the directory name `bundle`, you can pass a different
+    " If you don't like the directory name 'bundle', you can pass a different
     " name as an argument: call vundle#rc('~/src/vim/bundle')
     call vundle#rc()
     
     " Plugins
-    " Mandatory: let's manage vundle by vundle ;-)
+    " Required: let's manage vundle by vundle ;-)
     Bundle 'gmarik/vundle'
+    Bundle 'nanotech/jellybeans.vim'
+    Bundle 'tomasr/molokai'
+    Bundle 'bling/vim-airline'
+    Bundle 'Valloric/YouCompleteMe'
 
-    " 
-    if v:version >= 703 && has("patch584")
-        if has("python")
-
-        else
-            echoerr "Vim needs to have python support in order for the plugin \"YouCompleteMe\" to work."
-        endif
-    else
-        echoerr "You need at least Vim 7.3.584 in order for the plugin \"YouCompleteMe\" to work."
-    endif
-    " Bundle from Github
-    " Bundle 'tpope/vim-fugitive'
-    " Bundle 'Lokaltog/vim-easymotion'
-    " Bundle 'rstacruz/sparkup', {'rtp': 'vim/'}
-    " Bundle 'tpope/vim-rails.git'
-    " vim-scripts repos
-    " Bundle 'L9'
-    " Bundle 'FuzzyFinder'
-    " Non github repos example
-    "Bundle 'git://git.wincent.com/command-t.git'
-
+    " Required
     filetype plugin indent on
+
+    " Brief help
+    " :BundleList          - list configured bundles
+    " :BundleInstall(!)    - install(update) bundles
+    " :BundleSearch(!) foo - search(or refresh cache first) for foo
+    " :BundleClean(!)      - confirm(or auto-approve) removal of unused bundles
+    "
+    " see :h vundle for more details or wiki for FAQ
+    " NOTE: comments after Bundle command are not allowed..
 else
     echoerr "The vundle Vim plugin isn't installed! Please install it with 'git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle'"
 endif
 
-" TEMP for dev
+"}}}
 
-runtime bundle/pathogen/autoload/pathogen.vim
-execute pathogen#infect()
+"{{{ Positions and movements
+"-------------------------------------------------------------------------------
+
+" Force ourself to use the right way to use Vim by leaving the insert mode
+" asap we can.
+" noremap <Up> <nop>
+" noremap <Down> <nop>
+" noremap <Right> <nop>
+" noremap <Left> <nop>
+
+" <Ctrl> + motion operator to move around through wrapped lines. When soft
+" wrapping is enabled, each lines of the file splits accross several display
+" lines in order to don't need to scroll horizontally to see all the text.
+nnoremap <C-j> gj
+nnoremap <C-k> gk
+vnoremap <C-j> gj
+vnoremap <C-k> gk
+
+nnoremap <C-Down> gj
+nnoremap <C-Up> gk
+vnoremap <C-Down> gj
+vnoremap <C-Up> gk
+
+nnoremap <C-$> g$
+nnoremap <C-0> g0
+vnoremap <C-$> g$
+vnoremap <C-0> g0
+
+" Jump to the last position when reopening a file.
+if has("autocmd")
+    function! s:LastFilePosition()
+        if line("'\"") > 1 && line("'\"") <= line("$")
+            execute "normal! g'\""
+        endif
+    endfunction
+
+    augroup lastPosition
+        autocmd!
+        autocmd BufReadPost * :call <SID>LastFilePosition()
+    augroup end
+endif
+
+" Briefly jump to the matching bracket (only when it is visible).
+"set showmatch 
+
+" Use <tab> instead of % in order to key match brackets pairs.
+nnoremap <tab> %
+vnoremap <tab> %
+
+" NOTE: For mnemonic, the operator abbreviation names are set as "Inside Next
+" Parentheses". 
+"
+" Visually select text around last parentheses.
+onoremap ip) :<c-u>normal! F)vi(<cr>
+
+" Visually select text around next parentheses.
+onoremap in( :<c-u>normal! F(vi)<cr>
+
+" Visually select text around last bracket.
+onoremap ip{ :<c-u>normal! F}vi{<cr>
+
+" Visually select text around next bracket.
+onoremap in{ :<c-u>normal! F{vi}<cr>
+
 "}}}
 
 "{{{ Appearance
 "-------------------------------------------------------------------------------
+
+" Wrap long line of text, avoiding the wrapping to misbehave when unprintable
+" characters are made visible with the 'list' command.
+set wrap
+
+" Get the break at a word boundary
+set linebreak
+
+" Displaying all characters must be disabled in order for the wrapping to work
+" properly.
+set nolist
+
+" When line numbers are disabled, display a character indicating that the line
+" is currently soft wrapped.
+set showbreak=…
+
+" Format automatically paragraphs everytime text is inserted or deleted. As
+" this command is really annoying when writing code, use gqip to reformat the
+" paragraph instead.
+" set formatoptions=a
+
+" Only apply reformat on comments to avoid the code to become broken.
+set formatoptions+=c
+
+" Automatically insert the current comment leader after hitting 'o' or 'O' in
+" normal mode.
+set formatoptions+=o
+
+" Allow formatting of comments with "gq".
+set formatoptions+=q
+
+" Recognize automatically number lists and format them.
+set formatoptions+=n
+
+" Don't break a line after a one letter word
+set formatoptions+=1
+
 " Keep at least 3 lines above and below the cursor
 set scrolloff=3
 
-" Briefly jump to the matching bracket (only when visible)
-"set showmatch
+" Enable syntax highlighting
+if has("syntax")
+    syntax on
+endif 
 
-"  FIXME: Add relative number in normal mode and number in insert mode
+" Highlight the line where the cursor is currently on.
+if has("syntax")
+    set cursorline
+endif
 
-" Toggle line number to the current buffer (local)
-nnoremap <leader>n :call <SID>NumberToggle()<cr>
+" <Leader> + r : replace all ^M with normal linebreak.
+nnoremap <leader>r<cr> :%s/<C-V><C-M>/<C-V><C-M>/g<cr>
+
+" <Leader> + d : delete the additional linebreak induced by Windows/DOS style.
+nnoremap <leader>d<cr> :%s/<C-V><C-M>//g<cr>
+
+" Set number in all modes.
+set number
+
+" Set relative number in insert mode.
+if has("autocmd")
+    augroup relativeNumberInInsertMode
+        autocmd!
+        autocmd InsertEnter * :setlocal relativenumber 
+        autocmd InsertLeave * :setlocal norelativenumber
+    augroup end
+endif 
+
+" <Leader> + n to toggle the line numbers for the current local buffer.
 function! s:NumberToggle()
     if &number
         set nonumber
@@ -173,9 +312,9 @@ function! s:NumberToggle()
         echo "Line numbers enabled for \"" . expand("%:p") . "\""
     endif
 endfunction
+nnoremap <leader>n :call <SID>NumberToggle()<cr>
 
-" Toggle relative line number (local)
-nnoremap <leader>rn :call <SID>RelativeNumberToggle()<cr>
+" <Leader> + r + n to toggle the relative line numbers for the local buffer.
 function! s:RelativeNumberToggle()
     if &relativenumber
         set norelativenumber
@@ -185,46 +324,43 @@ function! s:RelativeNumberToggle()
         echo "Relative numbers enabled for \"" . expand("%:p") . "\""
     endif
 endfunction
+nnoremap <leader>rn :call <SID>RelativeNumberToggle()<cr>
 
-" Toggle the column which indicates limits of opened and closed folds
-nnoremap <silent><leader>f :call <SID>FoldColumnToggle()<cr>
+"<Leader> + f to toggle the column incating the the scope of the folds.
 function! s:FoldColumnToggle()
     if &foldcolumn
         setlocal foldcolumn=0
-        echo "Fold column deactivated for \"" . @% . "\""
+        echo "Fold column disabled for \"" . @% . "\""
     else
         setlocal foldcolumn=4
-        echo "Fold column activated for \"" . @% . "\""
+        echo "Fold column enabled for \"" . @% . "\""
     endif
 endfunction
+nnoremap <silent><leader>f :call <SID>FoldColumnToggle()<cr>
 
+" Reduce the scope of the syntax highlight, which prevents Vim to hang
+" terribly when syntax highlight is used on very long lines.
+if has("syntax") && has("autocmd")
+    function! s:GetMaxLength()
+        return max(map(range(1, line('$')), "col([v:val, '$'])")) - 1
+    endfunction
+
+    function! s:ReduceHighlightScope()
+        if s:GetMaxLength() ># &columns
+            execute "set synmaxcol=" . &columns
+        endif
+    endfunction
+
+    augroup ReduceHighlightScope
+        autocmd!
+        autocmd BufReadPost,VimResized * :call <SID>ReduceHighlightScope()
+    augroup end
+endif 
+
+" Set a colorscheme
 if has("syntax")
-    " Enable syntax highlighting
-    syntax on
-
-    " Reduce the scope of the syntax highlight, which prevents Vim to hang
-    " terribly when syntax highlight is used on very long lines.
-    if has("autocmd")
-        augroup ReduceHighlightScope
-            autocmd!
-            autocmd BufReadPost,VimResized * :call <SID>ReduceHighlightScope()
-        augroup end
-
-        function! s:GetMaxLength()
-            return max(map(range(1, line('$')), "col([v:val, '$'])")) - 1
-        endfunction
-
-        function! s:ReduceHighlightScope()
-            if s:GetMaxLength() ># &columns
-                execute "set synmaxcol=" . &columns
-            endif
-        endfunction
-    endif
-
-    " Set a colorscheme
     try
         let s:definedColorscheme = "jellybeans"
-        " let g:molokai_original = 1
         execute "colorscheme " . s:definedColorscheme
     catch /^Vim(\a\+):E185:/
         echo v:throwpoint
@@ -234,13 +370,38 @@ if has("syntax")
     " If using a dark background within the editing area and syntax highlighting
     " turn on this option as well, and forces the colorcheme to be adapted
     " set background=dark
-
-    " Highlight the line where the cursor is currently on
-    set cursorline
 endif
 
+" FIXME: terminal color hardcode shoun't be!
+set t_Co=256
 " Display information into the bottom line
 if has("statusline")
+
+  let g:airline_symbols = {}
+
+  " unicode symbols
+  let g:airline_left_sep = '»'
+  let g:airline_left_sep = '▶'
+  let g:airline_right_sep = '«'
+  let g:airline_right_sep = '◀'
+  let g:airline_symbols.linenr = '␊'
+  let g:airline_symbols.linenr = '␤'
+  let g:airline_symbols.linenr = '¶'
+  let g:airline_symbols.branch = '⎇'
+  let g:airline_symbols.paste = 'ρ'
+  let g:airline_symbols.paste = 'Þ'
+  let g:airline_symbols.paste = '∥'
+  let g:airline_symbols.whitespace = 'Ξ'
+
+  " powerline symbols
+  let g:airline_left_sep = ''
+  let g:airline_left_alt_sep = ''
+  let g:airline_right_sep = ''
+  let g:airline_right_alt_sep = ''
+  let g:airline_symbols.branch = ''
+  let g:airline_symbols.readonly = ''
+  let g:airline_symbols.linenr = ''
+
     " IMPROVE: Try to detect Powerline plugin as g:powerline_enabled doesn't exist
     " in this namespace
     " FIXME: Doesn't work if system-wide Vim configuration used
@@ -248,7 +409,7 @@ if has("statusline")
         " FIXME: Check xterm-256color
         "if &t_Co < 256
             " Explicitly tell Vim we are using a 88/256 color terminal
-            set t_Co=256
+             " set t_Co=256
 
          "   let g:Powerline_loaded = 0
         "endif
@@ -258,20 +419,20 @@ if has("statusline")
         let g:Powerline_symbols = 'fancy'
     else
         " Emulate the standard status enabled with command 'set ruler'
-        set statusline=%<    " Where to truncate line if too long
-        set statusline+=%f   " Path to the buffer file
-        set statusline+=\    " Add a space (have to be scaped)
-        set statusline+=%h   " Add [help] flag is help file
-        set statusline+=%m   " Add [+] (modified) flag is the file has been modified or
-                             "     [-] if the file is unmodifiable
-        set statusline+=%r   " Add [RO] flag if the file is read only
-        set statusline+=%=   " Switch to the right side
-        set statusline+=%-14.(%l,%c%V%)
-                             " () -> Add a new item group aligned with a 14 right padding
-                             " %l -> Line number
-                             " %c -> column number
-                             " %V -> Vertical column number (assumes tabulations are spaces)
-        set statusline+=\ %P " Space with the percentage of displayed file
+"        set statusline=%<    " Where to truncate line if too long
+"        set statusline+=%f   " Path to the buffer file
+"        set statusline+=\    " Add a space (have to be scaped)
+"        set statusline+=%h   " Add [help] flag is help file
+"        set statusline+=%m   " Add [+] (modified) flag is the file has been modified or
+"                             "     [-] if the file is unmodifiable
+"        set statusline+=%r   " Add [RO] flag if the file is read only
+"        set statusline+=%=   " Switch to the right side
+"        set statusline+=%-14.(%04l/%O4L,%c%V%)
+"                             " () -> Add a new item group aligned with a 14 right padding
+"                             " %l -> Line number
+"                             " %c -> column number
+"                             " %V -> Vertical column number (assumes tabulations are spaces)
+"        set statusline+=\ %P " Space with the percentage of displayed file
     endif
 
     " Always display a status line
@@ -280,11 +441,12 @@ endif
 
 " Displays a line at char 80 and colorizes text that goes beyong this value
 " FIXME: Only display this line when text goes beyond it.
-if has('syntax')
-   " set colorcolumn=79
-   highlight link OverLength ColorColumn
-   "execute 'match OverLength /\%'.&cc.'v.\+/'
-endif
+" if has('syntax')
+"    set colorcolumn=79
+"    highlight link OverLength ColorColumn
+"    execute 'match OverLength /\%'.&cc.'v.\+/'
+" endif
+
 " FIXME: Strip all trailing whitespaces in the current file
 "nnoremap <leader>W :%s/\s\+$//<cr>:let @/=''<cr>:echo 'Trailing whitespaces
 "removed for ' . expand("%")<cr>
@@ -292,44 +454,19 @@ endif
 " Add a completion menu when invoking autocompletion in the Vim cmd line
 "set wildmenu
 
-" Show invisible characters
-nnoremap <leader><space> :call <SID>ToggleInvisibleCharactersVisibility()<cr>
-function! s:ToggleInvisibleCharactersVisibility()
+" <Leader> + <space> : show invisible characters.
+function! s:ToggleInvisibleCharacters()
     if &l:list
         set nolist
-        echo "Invisible characters have been hidden for \"" . expand("%") . "\""
+        echo "Invisible characters have been hidden for \"" . expand("%") . "\"."
     else
         set list
         set listchars=tab:▸\ ,eol:¬
-        echo "Invisible characters have been shown for \"" . expand("%") . "\""
+        echo "Invisible characters have been shown for \"" . expand("%") . "\"."
     endif 
 endfunction
+nnoremap <leader><space> :call <SID>ToggleInvisibleCharacters()<cr>
 
-" Wrap long line of text, avoiding the wrapping to misbehave when unprintable
-" characters are made visible with the 'list' command.
-set wrap
-set linebreak
-set nolist
-
-" Format automatically paragraphs everytime text is inserted or deleted.
-set formatoptions=a
-" Only apply reformat on comments to avoid the code to become broken.
-set formatoptions+=c
-" Automatically insert the current comment leader after hitting 'o' or 'O' in
-" normal mode.
-set formatoptions+=o
-" Allow formatting of comments with "gq".
-set formatoptions+=q
-" Recognize automatically number lists and format them.
-set formatoptions+=n
-" Don't break a line after a one letter word
-set formatoptions+=1
-
-"Replace all ^M with normal linebreak
-nnoremap <leader>r<cr> :%s/<C-V><C-M>/<C-V><C-M>/g<cr>
-
-"Delete the additional linebreak induced by Windows/DOS style
-nnoremap <leader>d<cr> :%s/<C-V><C-M>//g<cr>
 "}}}
 
 "{{{ Autocompletion
@@ -350,8 +487,9 @@ endif
 
 "{{{ Indentation
 "-------------------------------------------------------------------------------
+
+" Load indentation rules and plugins according to the detected filetype
 if has("autocmd")
-    " Load indentation rules and plugins according to the detected filetype
     filetype plugin indent on
 endif
 
@@ -382,9 +520,11 @@ set shiftwidth=4
 " Use the same indent as the previous indented line
 set autoindent
 
-" Fold parameters
+" Enable C automatic indenting
+set cindent
+
+" Add markers folds for Vim and Bash/sh files
 if has("folding")
-    " Add markers folds for Vim and Bash/sh files
     augroup filetype_vim
         autocmd!
         autocmd FileType vim,sh setlocal foldmethod=marker foldlevelstart=0
@@ -392,25 +532,9 @@ if has("folding")
 endif
 "}}}
 
-"{{{ Operator pending-mapping
-"-------------------------------------------------------------------------------
-" NOTE: For mnemonic, the operator abbreviation names are set as "Inside Next
-" Parentheses".
-" Visually select text around last parentheses
-onoremap ip) :<c-u>normal! F)vi(<cr>
-
-" Visually select text around next parentheses
-onoremap in( :<c-u>normal! F(vi)<cr>
-
-" Visually select text around last bracket
-onoremap ip{ :<c-u>normal! F}vi{<cr>
-
-" Visually select text around next bracket
-onoremap in{ :<c-u>normal! F{vi}<cr>
-"}}}
-
 "{{{ Search options
 "-------------------------------------------------------------------------------
+
 " When searching, this option allows you to jump to the beginning of the file,
 " when the end is reached.
 set wrapscan
@@ -447,10 +571,6 @@ if has("extra_search")
         endif
     endfunction
 endif
-
-" Use <tab> instead of % in order to key match brackets pairs
-nnoremap <tab> %
-vnoremap <tab> %
 
 " Opens help vertically
 noremap <leader><F1> :vertical rightbelow help<cr>
@@ -700,14 +820,14 @@ endif
 " Pay attention, the $MYVIMRC env variable is only set when a vimrc filetype is found.
 if strlen($MYVIMRC) != 0
     nnoremap <silent><leader>ev :tabnew $MYVIMRC<cr>:echo $MYVIMRC . ' has been loaded in a new tab.'<cr>
-    nnoremap <silent><leader>sv :silent :source $MYVIMRC<cr>:echo $MYVIMRC . " has been sourced"<cr>
+    nnoremap <silent><leader>sv :silent :source $MYVIMRC<cr>:echo $MYVIMRC . " has been sourced."<cr>
 else
-    nnoremap <silent><leader>ev :echohl ErrorMsg<cr>:echo ".vimrc file not found"<cr>:echohl None<cr>
-    nnoremap <silent><leader>sv :echohl ErrorMsg<cr>:echo ".vimrc file not found"<cr>:echohl None<cr>
+    nnoremap <silent><leader>ev :echohl ErrorMsg<cr>:echo ".vimrc file not found."<cr>:echohl None<cr>
+    nnoremap <silent><leader>sv :echohl ErrorMsg<cr>:echo ".vimrc file not found."<cr>:echohl None<cr>
 endif
 
 " Source current file
-nnoremap <silent><leader>s :source %<cr>:execute 'echo "\"' . expand("%:p") . '\" sourced"'<cr>
+nnoremap <silent><leader>s :source %<cr>:execute 'echo "\"' . expand("%:p") . '\" sourced."'<cr>
 "}}}
 
 "{{{ Tabs management
