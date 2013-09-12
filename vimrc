@@ -260,6 +260,9 @@ onoremap in{ :<c-u>normal! F{vi}<cr>
 "{{{ Appearance
 "-------------------------------------------------------------------------------
 
+" Disable intro message appearing when starting Vim
+set shortmess+=I 
+
 " Wrap long line of text, avoiding the wrapping to misbehave when unprintable
 " characters are made visible with the 'list' command.
 set wrap
