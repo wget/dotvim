@@ -149,6 +149,7 @@ if strlen(finddir(fnamemodify($MYVIMRC, ":p:h") . "/.vim/bundle/vundle/")) ||
     Bundle 'bling/vim-airline'
     Bundle 'Valloric/YouCompleteMe'
     Bundle 'SirVer/ultisnips'
+    Bundle 'tomtom/tcomment_vim'
 
     " Required
     filetype plugin indent on
