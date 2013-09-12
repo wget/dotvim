@@ -70,7 +70,7 @@ nnoremap <leader>" mqviw<esc>bi"<esc>ea"<esc>`ql
 nnoremap <leader>' mqviw<esc>bi'<esc>ea'<esc>`ql
 
 " Surround a visual block with "
-vnoremap <leader>' mq<esc>`<i"<esc>`>a"<esc>`q
+vnoremap <leader>" mq<esc>`<i"<esc>`>a"<esc>`q
 
 " Paste from X clipboard.
 " NOTE: Don't map this key in normal mode as CTRL-V is used for vertical
@@ -148,6 +148,7 @@ if strlen(finddir(fnamemodify($MYVIMRC, ":p:h") . "/.vim/bundle/vundle/")) ||
     Bundle 'tomasr/molokai'
     Bundle 'bling/vim-airline'
     Bundle 'Valloric/YouCompleteMe'
+    Bundle 'SirVer/ultisnips'
 
     " Required
     filetype plugin indent on
@@ -471,6 +472,10 @@ nnoremap <leader><space> :call <SID>ToggleInvisibleCharacters()<cr>
 
 "{{{ Autocompletion
 "-------------------------------------------------------------------------------
+
+" Avoid YouCompleteMe conflicts with default UltiSnips key mappings.
+let g:UltiSnipsExpandTrigger="<<-tab>"
+
 " Add location of the dictionary word completion
 if filereadable("/usr/share/dict/words")
     set dictionary+=/usr/share/dict/words
@@ -564,7 +569,7 @@ if has("extra_search")
     function! s:HlsearchToggle()
         if &l:hlsearch
             set nohlsearch
-            echo "Highlighted matches deactivated."
+            echo "Highlighted matches disabled."
         else
             set hlsearch
             echo "Previous matches highlighted."
