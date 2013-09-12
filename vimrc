@@ -42,6 +42,29 @@ endif
 " in the statusline when used with vim-powerline plugin.
 set encoding=utf-8
 
+" Switch to hexadecimal mode
+function! s:HexadecimalModeToggle()
+    if exists("b:bin") && b:bin
+        let b:bin = 0
+        " Use the external binary editor "xxd" which comes bundled with Vim.
+        silent execute "%!xxd -r"
+        echo "Hexadecimal mode disabled for \"" . expand("%:p") . "\""
+    else
+        let b:bin = 1
+        silent execute "%!xxd"
+        echo "Hexadecimal mode enabled for \"" . expand("%:p") . "\""
+    endif
+endfunction
+nnoremap <leader>sh :call <SID>HexadecimalModeToggle()<cr>
+
+" if has("autocmd")
+"     augroup HexEditing
+"         augroup!
+" 
+"                        
+"     augroup END
+" endif
+
 " Enable spell checking only for C, C++ and Tex files
 if has("autocmd")
     augroup spellChecking
