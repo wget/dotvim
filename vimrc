@@ -135,13 +135,14 @@ for j in s:splitted
             " Remove quotes
             let s:systemVimrcLocation = strpart(s:systemVimrcLocation, 1)
             let s:systemVimrcLocation = strpart(s:systemVimrcLocation, 0, strlen(s:systemVimrcLocation) - 1)
-            echo s:systemVimrcLocation
+            " Expand location like $VIM/vimrc
+            let s:systemVimrcLocation = expand(s:systemVimrcLocation)
             break
         endif
     endif
     let s:i += 1
 endfor
-unlet s:splitted
+unlet s:splitted s:versionRedirected
 
 " If vundle is installed in /home/USERNAME/.vim/bundle/vundle
 "                     or in /etc/vim/bundle/vundle, use it!
