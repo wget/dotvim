@@ -13,9 +13,9 @@
 
 OPTIONAL:
 
-5. As vim-airline is using special symbols, you'll have to patch/replace the font you are using in your terminal emulator. Here is a pack of fonts that have been already patched: https://github.com/Lokaltog/powerline-fonts
+5. As vim-airline is using special symbols, you'll have to patch/replace the font you are using in your terminal emulator. Here is a pack of fonts that have been already patched: https://github.com/Lokaltog/powerline-fonts If you're using an ArchLinux GNU/Linux distribution or any derivative, install the "powerline-fonts-git" package from AUR, and choose any font with "for Powerline" in its name.
 
-6. As the plugin YouCompleteMe is using native code (C compiled), you will have to compile the code that has just been cloned. First, make sure you have a valid compiler already installed (gcc recommended). Then, go in the plugin directory:
+6. As the plugin YouCompleteMe is using native code (C compiled), you will have to compile the code that has just been cloned. First, make sure you have a valid compiler already installed (gcc recommended). Then, go to the plugin directory:
 ...`$ cd .vim/bundle/YouCompleteMe/`
 ...and then execute the shell script 
 ...`$ ./install.sh`

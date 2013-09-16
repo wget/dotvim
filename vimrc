@@ -127,7 +127,7 @@ let s:j = 0
 let s:systemVimrcLocation = ''
 let s:splitted = split(s:versionRedirected)
 for j in s:splitted
-    if (j =~ ':')
+    if j =~ ':'
         let s:j += 1
         " Until 4 as the split feature cuts at spaces
         if s:j == 4
@@ -175,6 +175,7 @@ if s:hasUserVundle || s:hasSystemVundle
     Bundle 'Valloric/YouCompleteMe'
     Bundle 'SirVer/ultisnips'
     Bundle 'tomtom/tcomment_vim'
+    Bundle 'tpope/vim-markdown'
 
     " Required
     filetype plugin indent on
