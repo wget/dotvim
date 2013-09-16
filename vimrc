@@ -122,42 +122,42 @@ redir => s:versionRedirected
     silent version
 redir END
 
-let s:splitted = split(s:versionRedirected)
-
 let s:i = 0
+let s:j = 0
+let s:systemVimrcLocation = ''
+let s:splitted = split(s:versionRedirected)
 for j in s:splitted
-    if (j ==# "system") && (get(s:splitted, s:i + 1) ==# "vimrc") && get(s:splitted, s:i + 2) =~ "file:"
-        let s:systemVimrcLocation = get(s:splitted, s:i + 3)
+    if (j =~ ':')
+        let s:j += 1
+        " Until 4 as the split feature cuts at spaces
+        if s:j == 4
+            let s:systemVimrcLocation = get(s:splitted, s:i + 1)
+            " Remove quotes
+            let s:systemVimrcLocation = strpart(s:systemVimrcLocation, 1)
+            let s:systemVimrcLocation = strpart(s:systemVimrcLocation, 0, strlen(s:systemVimrcLocation) - 1)
+            echo s:systemVimrcLocation
+            break
+        endif
     endif
-
     let s:i += 1
 endfor
 unlet s:splitted
 
-let s:temp = split(s:systemVimrcLocation, '\zs')
-let s:stringSize = strlen(s:systemVimrcLocation) - 1
-let s:systemVimrcLocation = ''
-let s:i = 1
-while s:i < s:stringSize 
-    let s:systemVimrcLocation .= get(s:temp, s:i)
-    let s:i += 1
-endwhile
-unlet s:i
-
 " If vundle is installed in /home/USERNAME/.vim/bundle/vundle
 "                     or in /etc/vim/bundle/vundle, use it!
 " NOTE: Only the path is checked.
-if strlen(finddir(fnamemodify($MYVIMRC, ":p:h") . "/.vim/bundle/vundle/")) ||
-  \strlen(finddir(fnamemodify(s:systemVimrcLocation, ":p:h") . "/vim/bundle/vundle/"))
+let s:hasUserVundle = strlen(finddir(fnamemodify($MYVIMRC, ":p:h") . "/.vim/bundle/vundle/")) 
+let s:hasSystemVundle = strlen(finddir(fnamemodify(s:systemVimrcLocation, ":p:h") . "/vim/bundle/vundle/"))
+
+if s:hasUserVundle || s:hasSystemVundle  
 
     filetype off
 
     " Add Vundle to the runtimepath
-    if strlen(finddir(fnamemodify($MYVIMRC, ":p:h") . "/.vim/bundle/vundle/"))
+    if s:hasUserVundle
         set runtimepath+=~/.vim/bundle/vundle/
-    elseif strlen(finddir(fnamemodify(s:systemVimrcLocation, ":p:h") . "/vim/bundle/vundle/"))
-        let $systemVundle=fnamemodify(s:systemVimrcLocation, ":p:h") . '/vim/bundle/vundle'
-        set runtimepath+=$systemVundle
+    elseif s:hasSystemVundle
+        execute "set runtimepath += fnamemodify(s:systemVimrcLocation, \":p:h\") . '/vim/bundle/vundle'"
     endif
 
     " If you don't like the directory name 'bundle', you can pass a different
@@ -165,6 +165,7 @@ if strlen(finddir(fnamemodify($MYVIMRC, ":p:h") . "/.vim/bundle/vundle/")) ||
     call vundle#rc()
     
     " Plugins
+    " NOTE: Comments after Bundle command are not allowed.
     " Required: let's manage vundle by vundle ;-)
     Bundle 'gmarik/vundle'
     Bundle 'nanotech/jellybeans.vim'
@@ -184,7 +185,6 @@ if strlen(finddir(fnamemodify($MYVIMRC, ":p:h") . "/.vim/bundle/vundle/")) ||
     " :BundleClean(!)      - confirm(or auto-approve) removal of unused bundles
     "
     " see :h vundle for more details or wiki for FAQ
-    " NOTE: comments after Bundle command are not allowed..
 else
     echoerr "The vundle Vim plugin isn't installed! Please install it with 'git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle'"
 endif
