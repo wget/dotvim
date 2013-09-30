@@ -109,7 +109,7 @@ nnoremap <leader>v V`]
 " Save automatically the file when losing focus.
 augroup saveOnFocusLost
     autocmd!
-    autocmd FocusLost * :wa
+    autocmd FocusLost * silent! wa
 augroup end
 
 "}}}
