@@ -402,6 +402,12 @@ if has("syntax")
     " set background=dark
 endif
 
+" Override the default Monospace font when GUI is running and sets its size to
+" 10.
+if has('gui_running')
+    set guifont=Droid\ Sans\ Mono\ for\ Powerline\ 10
+endif
+
 " FIXME: terminal color hardcode shoun't be!
 set t_Co=256
 " Display information into the bottom line
