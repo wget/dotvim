@@ -176,6 +176,7 @@ if s:hasUserVundle || s:hasSystemVundle
     Bundle 'SirVer/ultisnips'
     Bundle 'tomtom/tcomment_vim'
     Bundle 'tpope/vim-markdown'
+    Bundle 'junegunn/seoul256.vim'
 
     " Required
     filetype plugin indent on
@@ -376,8 +377,8 @@ if has("syntax") && has("autocmd")
     endfunction
 
     function! s:ReduceHighlightScope()
-        if s:GetMaxLength() ># &columns
-            execute "set synmaxcol=" . &columns
+        if s:GetMaxLength() ># (&columns * 3)
+            execute "set synmaxcol=" . (&columns * 3)
         endif
     endfunction
 
