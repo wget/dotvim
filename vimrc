@@ -177,6 +177,7 @@ if s:hasUserVundle || s:hasSystemVundle
     Bundle 'tomtom/tcomment_vim'
     Bundle 'tpope/vim-markdown'
     Bundle 'junegunn/seoul256.vim'
+    Bundle 'osyo-manga/vim-over'
 
     " Required
     filetype plugin indent on
