@@ -1,28 +1,32 @@
 ## Installation
 
- 1. Clone this repository
+ 1. First, as some plugins used in this configuration (as Ultisnips) require Python support, make sure your Vim version comes with python support by typing the Vim exec `:version` command and checking if there is `+python` or `+python3` in its output.
+
+    If your Vim does not support python, you will have to either recompile Vim from sources or install the `gvim` package. Indeed, on GNU/Linux distributions the gvim package is typically linked against python (checked on Debian and ArchLinux based distributions).
+
+ 2. Clone this repository
 
         git clone https://github.com/wget/dotvim.git ~/.vim
 
- 2. Create symlinks
+ 3. Create symlinks
 
         $ ln -s ~/.vim/vimrc ~/.vimrc
 
- 3. Install Vundle, the Vim plugin manager
+ 4. Install Vundle, the Vim plugin manager
 
         $ git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
 
- 4. Start Vim, type `:BundleInstall`, press return and wait for all plugin repositories to be cloned.
+ 5. Start Vim, type `:BundleInstall`, press return and wait for all plugin repositories to be cloned.
 
     OPTIONAL:
 
- 5. As vim-airline is using special symbols, you'll have to patch/replace the font you are using in your terminal emulator. 
+ 6. As vim-airline is using special symbols, you'll have to patch/replace the font you are using in your terminal emulator. 
 
     An already patched pack of fonts can be obtained [here](https://github.com/Lokaltog/powerline-fonts).
    
     If you're using ArchLinux or any derivative, install the "[powerline-fonts-git](https://aur.archlinux.org/packages/powerline-fonts-git)" package from [AUR](https://aur.archlinux.org), and choose any font with "for Powerline" in its name in your terminal emulator.
 
- 6. As the plugin YouCompleteMe is using native code (C compiled), you will have to compile the code that has just been cloned.
+ 7. As the plugin YouCompleteMe is using native code (C compiled), you will have to compile the code that has just been cloned.
 
     First, make sure you have a valid compiler already installed (gcc recommended). Then, go to the plugin directory
 
