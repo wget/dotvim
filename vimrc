@@ -150,7 +150,7 @@ function GetSystemVimRcLocation()
         endif
         let l:i += 1
     endfor
-    return l:location
+    return expand(l:location)
 endfunction
 
 function GetSystemWideLocation()
@@ -170,7 +170,7 @@ function IsRunningAsRoot()
 endfunction
 
 function HasSystemWideConfiguration() 
-    if filereadable(fnamemodify(GetSystemVimRcLocation()))
+    if filereadable(GetSystemVimRcLocation())
         return 1
     endif
 endfunction
@@ -180,7 +180,7 @@ function IsVundleInstalled()
         return 1
     endif
     
-    if filereadable(fnamemodify(GetSystemVimRcLocation(), ":p:h") . "/vim/bundle/vundle/README.md")
+    if filereadable(GetSystemWideLocation() . "/bundle/vundle/README.md")
         return 2
     endif
 endfunction
