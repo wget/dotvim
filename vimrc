@@ -563,9 +563,6 @@ set shiftwidth=4
 " Use the same indent as the previous indented line
 set autoindent
 
-" Enable C automatic indenting
-set cindent
-
 " Add markers folds for Vim and Bash/sh files
 if has("folding")
     augroup filetype_vim
