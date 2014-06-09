@@ -164,7 +164,19 @@ function GetSystemWideLocation()
 endfunction
 
 function IsRunningAsRoot()
-    if expand($USER) == "root"
+    " We cannot use the $USER environnment variable. Indeed, when running su
+    " from a standard user, the $USER will still display the standard username
+    " while we have root permissions. Using su - is the solution since the
+    " dash ask to have a login shell which ask to flush then reload all
+    " environment variables.
+    " if expand($USER) == "root"
+    if !executable("whoami")
+        echoerr "Unable to find the whoami command in your PATH environment variable."
+        exit
+    endif
+
+    let l:username = split(system("whoami"))
+    if l:username[0] == "root"
         return 1
     endif
 endfunction
