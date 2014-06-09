@@ -118,37 +118,46 @@ augroup end
 "-------------------------------------------------------------------------------
 
 " Get system vimrc location.
-redir => s:versionRedirected
-    silent version
-redir END
+function GetSystemVimRcLocation()
+    redir => l:version
+        silent version
+    redir END
 
-let s:i = 0
-let s:j = 0
-let s:systemVimrcLocation = ''
-let s:splitted = split(s:versionRedirected)
-for j in s:splitted
-    if j =~ ':'
-        let s:j += 1
-        " Until 4 as the split feature cuts at spaces
-        if s:j == 4
-            let s:systemVimrcLocation = get(s:splitted, s:i + 1)
-            " Remove quotes
-            let s:systemVimrcLocation = strpart(s:systemVimrcLocation, 1)
-            let s:systemVimrcLocation = strpart(s:systemVimrcLocation, 0, strlen(s:systemVimrcLocation) - 1)
-            " Expand location like $VIM/vimrc
-            let s:systemVimrcLocation = expand(s:systemVimrcLocation)
-            break
+    let l:i = 0
+    let l:j = 0
+    let l:word = ''
+    let l:location = ''
+    let l:splitted = split(l:version)
+    for l:word in l:splitted
+        if l:word =~ ':'
+            let l:j += 1
+
+            " The fourth colon the :version command will display if the one
+            " from the system vimrc location.
+            if l:j == 4
+                let l:location = get(l:splitted, l:i + 1)
+
+                " Remove quotes
+                let l:location = strpart(l:location, 1)
+                let l:location = strpart(l:location, 0, strlen(l:location) - 1)
+
+                " Expand location if it use environment variables like in
+                " $VIM/vimrc.
+                let l:location = expand(l:location)
+
+                break
+            endif
         endif
-    endif
-    let s:i += 1
-endfor
-unlet s:splitted s:versionRedirected
+        let l:i += 1
+    endfor
+    return l:location
+endfunction
 
 " If vundle is installed in /home/USERNAME/.vim/bundle/vundle
 "                     or in /etc/vim/bundle/vundle, use it!
 " NOTE: Only the path is checked.
 let s:hasUserVundle = strlen(finddir(fnamemodify($MYVIMRC, ":p:h") . "/.vim/bundle/vundle/")) 
-let s:hasSystemVundle = strlen(finddir(fnamemodify(s:systemVimrcLocation, ":p:h") . "/vim/bundle/vundle/"))
+let s:hasSystemVundle = strlen(finddir(fnamemodify(GetSystemVimRcLocation(), ":p:h") . "/vim/bundle/vundle/"))
 
 if s:hasUserVundle || s:hasSystemVundle  
 
