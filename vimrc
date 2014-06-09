@@ -218,7 +218,7 @@ if !IsVundleInstalled()
 
     echo "Installing vundle into " . s:location
     " The default permission used by mkdir() is 755
-    call mkdir(s:location, "p")
+    call mkdir("s:location", "p")
     execute "silent !git clone https://github.com/gmarik/vundle " . s:location . "/vundle"
 
     let s:vundleFirstInstall = 1
@@ -228,9 +228,9 @@ filetype off
 
 " Add Vundle to the runtimepath
 if IsVundleInstalled() == 1
-    set runtimepath+=~/.vim/bundle/vundle/
+    set runtimepath+=~/.vim/bundle/vundle
 elseif IsVundleInstalled() == 2
-    execute "set runtimepath += fnamemodify(GetSystemWideLocation() . '/bundle/vundle'"
+    execute "set runtimepath+=" . GetSystemWideLocation() . "/bundle/vundle"
 endif
 
 " If you don't like the directory name 'bundle', you can pass a different
