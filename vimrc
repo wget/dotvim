@@ -188,6 +188,7 @@ if s:hasUserVundle || s:hasSystemVundle
     Bundle 'junegunn/seoul256.vim'
     Bundle 'osyo-manga/vim-over'
     Bundle 'chikamichi/mediawiki.vim'
+    Bundle 'git://git.code.sf.net/p/vim-latex/vim-latex'
 
     " Required
     filetype plugin indent on
