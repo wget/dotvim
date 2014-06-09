@@ -141,8 +141,8 @@ function GetSystemVimRcLocation()
                 let l:location = strpart(l:location, 1)
                 let l:location = strpart(l:location, 0, strlen(l:location) - 1)
 
-                " Expand location if it use environment variables like in
-                " $VIM/vimrc.
+                " Expand the location if the latter uses environment variables
+                " e.g. $VIM/vimrc.
                 let l:location = expand(l:location)
 
                 break
@@ -153,55 +153,109 @@ function GetSystemVimRcLocation()
     return l:location
 endfunction
 
-" If vundle is installed in /home/USERNAME/.vim/bundle/vundle
-"                     or in /etc/vim/bundle/vundle, use it!
-" NOTE: Only the path is checked.
-let s:hasUserVundle = strlen(finddir(fnamemodify($MYVIMRC, ":p:h") . "/.vim/bundle/vundle/")) 
-let s:hasSystemVundle = strlen(finddir(fnamemodify(GetSystemVimRcLocation(), ":p:h") . "/vim/bundle/vundle/"))
+function GetSystemWideLocation()
+        " If the folder has already a vim subfolder, don't need to add one
+        " again.
+        if fnamemodify(GetSystemVimRcLocation(), ":p:h") =~ "vim"
+            return fnamemodify(GetSystemVimRcLocation(), ":p:h")
+        else
+            return fnamemodify(GetSystemVimRcLocation(), ":p:h") . "/vim"
+        endif
+endfunction
 
-if s:hasUserVundle || s:hasSystemVundle  
+function IsRunningAsRoot()
+    if expand($USER) == "root"
+        return 1
+    endif
+endfunction
 
-    filetype off
+function HasSystemWideConfiguration() 
+    if filereadable(fnamemodify(GetSystemVimRcLocation()))
+        return 1
+    endif
+endfunction
 
-    " Add Vundle to the runtimepath
-    if s:hasUserVundle
-        set runtimepath+=~/.vim/bundle/vundle/
-    elseif s:hasSystemVundle
-        execute "set runtimepath += fnamemodify(s:systemVimrcLocation, \":p:h\") . '/vim/bundle/vundle'"
+function IsVundleInstalled()
+    if filereadable(fnamemodify($MYVIMRC, ":p:h") . "/.vim/bundle/vundle/README.md")
+        return 1
+    endif
+    
+    if filereadable(fnamemodify(GetSystemVimRcLocation(), ":p:h") . "/vim/bundle/vundle/README.md")
+        return 2
+    endif
+endfunction
+
+if !IsVundleInstalled()
+    " NOTE: In the following line, the user configuration always take
+    " precedence over the system-wide configuration if any.
+
+    if !executable("git") 
+        " echoerr does NOT abord sourcing if it is used. The followings line until the
+        " end of the file will still be executedV
+        echoerr "Git isn't installed on this system or cannot be found via the PATH variable."
+        exit
     endif
 
-    " If you don't like the directory name 'bundle', you can pass a different
-    " name as an argument: call vundle#rc('~/src/vim/bundle')
-    call vundle#rc()
-    
-    " Plugins
-    " NOTE: Comments after Bundle command are not allowed.
-    " Required: let's manage vundle by vundle ;-)
-    Bundle 'gmarik/vundle'
-    Bundle 'nanotech/jellybeans.vim'
-    Bundle 'tomasr/molokai'
-    Bundle 'bling/vim-airline'
-    Bundle 'Valloric/YouCompleteMe'
-    Bundle 'SirVer/ultisnips'
-    Bundle 'tomtom/tcomment_vim'
-    Bundle 'tpope/vim-markdown'
-    Bundle 'junegunn/seoul256.vim'
-    Bundle 'osyo-manga/vim-over'
-    Bundle 'chikamichi/mediawiki.vim'
-    Bundle 'git://git.code.sf.net/p/vim-latex/vim-latex'
+    " If we have a system wide configuration, and we are running as root,
+    " install Vundle as systemwide, otherwise, install vundle as simple user.
+    if HasSystemWideConfiguration() && IsRunningAsRoot()
+        let l:location = GetSystemWideLocation() . "/bundle"
+    else
+        let l:location = expand($HOME) . "/vim/bundle"
+    endif
 
-    " Required
-    filetype plugin indent on
+    echo "Installing vundle into " . l:location
+    " The default permission used by mkdir() is 755
+    call mkdir(l:location, "p")
+    execute "silent !git clone https://github.com/gmarik/vundle" . l:location . "/vundle"
 
-    " Brief help
+    let s:vundleFirstInstall = 1
+endif
+
+filetype off
+
+" Add Vundle to the runtimepath
+if IsVundleInstalled() == 1
+    set runtimepath+=~/.vim/bundle/vundle/
+elseif IsVundleInstalled() == 2
+    execute "set runtimepath += fnamemodify(GetSystemWideLocation() . '/bundle/vundle'"
+endif
+
+" If you don't like the directory name 'bundle', you can pass a different
+" name as an argument: call vundle#rc('~/src/vim/bundle')
+call vundle#rc()
+
+" Mandatory, let's manage vundle by vundle.
+" NOTE: Comments after Bundle command are not allowed.
+Bundle 'gmarik/vundle'
+
+" Plugins
+Bundle 'nanotech/jellybeans.vim'
+Bundle 'tomasr/molokai'
+Bundle 'bling/vim-airline'
+Bundle 'Valloric/YouCompleteMe'
+Bundle 'SirVer/ultisnips'
+Bundle 'tomtom/tcomment_vim'
+Bundle 'tpope/vim-markdown'
+Bundle 'junegunn/seoul256.vim'
+Bundle 'osyo-manga/vim-over'
+Bundle 'chikamichi/mediawiki.vim'
+Bundle 'git://git.code.sf.net/p/vim-latex/vim-latex'
+
+" Required
+filetype plugin indent on
+
+" Install plugins.
+if exists("s:vundleFirstInstall")
+    echo "Installing all your plugins..."
+    BundleInstall()
+    " For other commands:
     " :BundleList          - list configured bundles
     " :BundleInstall(!)    - install(update) bundles
     " :BundleSearch(!) foo - search(or refresh cache first) for foo
     " :BundleClean(!)      - confirm(or auto-approve) removal of unused bundles
     "
     " see :h vundle for more details or wiki for FAQ
-else
-    echoerr "The vundle Vim plugin isn't installed! Please install it with 'git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle'"
 endif
 
 "}}}
