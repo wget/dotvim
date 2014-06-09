@@ -199,15 +199,15 @@ if !IsVundleInstalled()
     " If we have a system wide configuration, and we are running as root,
     " install Vundle as systemwide, otherwise, install vundle as simple user.
     if HasSystemWideConfiguration() && IsRunningAsRoot()
-        let l:location = GetSystemWideLocation() . "/bundle"
+        let s:location = GetSystemWideLocation() . "/bundle"
     else
-        let l:location = expand($HOME) . "/vim/bundle"
+        let s:location = expand($HOME) . "/vim/bundle"
     endif
 
-    echo "Installing vundle into " . l:location
+    echo "Installing vundle into " . s:location
     " The default permission used by mkdir() is 755
-    call mkdir(l:location, "p")
-    execute "silent !git clone https://github.com/gmarik/vundle" . l:location . "/vundle"
+    call mkdir(s:location, "p")
+    execute "silent !git clone https://github.com/gmarik/vundle " . s:location . "/vundle"
 
     let s:vundleFirstInstall = 1
 endif
