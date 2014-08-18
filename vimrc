@@ -219,6 +219,12 @@ if !IsVundleInstalled()
     echo "Installing vundle into " . s:location
     " The default permission used by mkdir() is 755
     call mkdir("s:location", "p")
+
+    " Make sure the folder has been really created. It could fail.
+    if !isdirectory("s:location")
+        echoerr "Creating " . s:location . " has failed. Make sure you have permissions."
+        exit
+    endif
     execute "silent !git clone https://github.com/gmarik/vundle " . s:location . "/vundle"
 
     let s:vundleFirstInstall = 1
@@ -247,6 +253,7 @@ Bundle 'tomasr/molokai'
 Bundle 'bling/vim-airline'
 Bundle 'Valloric/YouCompleteMe'
 Bundle 'SirVer/ultisnips'
+Bundle 'honza/vim-snippets'
 Bundle 'tomtom/tcomment_vim'
 Bundle 'tpope/vim-markdown'
 Bundle 'junegunn/seoul256.vim'
@@ -588,7 +595,8 @@ nnoremap <leader><space> :call <SID>ToggleInvisibleCharacters()<cr>
 "-------------------------------------------------------------------------------
 
 " Avoid YouCompleteMe conflicts with default UltiSnips key mappings.
-let g:UltiSnipsExpandTrigger="<<-tab>"
+let g:UltiSnipsExpandTrigger="<CR>"
+let g:UltiSnipsJumpForwardTrigger="<tab>"
 
 " Add location of the dictionary word completion
 if filereadable("/usr/share/dict/words")
